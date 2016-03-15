@@ -20,7 +20,7 @@ if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       cp -r "./atom/${ATOM_ORIGINAL_APP_NAME}" "./atom/${ATOM_APP_NAME}"
       export ATOM_SCRIPT_NAME="atom-${ATOM_CHANNEL}"
       export ATOM_SCRIPT_PATH="./atom-${ATOM_CHANNEL}"
-      ln -s "./atom/${ATOM_APP_NAME}/Contents/Resources/app/atom.sh" "${ATOM_SCRIPT_PATH}"
+      ln -s "./atom/${ATOM_ORIGINAL_APP_NAME}/Contents/Resources/app/atom.sh" "${ATOM_SCRIPT_PATH}"
     fi
     export PATH="$PWD/atom/${ATOM_APP_NAME}/Contents/Resources/app/apm/bin:$PATH"
     export ATOM_PATH="./atom"
