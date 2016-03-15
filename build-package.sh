@@ -14,7 +14,9 @@ if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       export ATOM_SCRIPT_NAME="atom.sh"
       export ATOM_SCRIPT_PATH="./atom/${ATOM_APP_NAME}/Contents/Resources/app/atom.sh"
     else
-      export ATOM_APP_NAME="Atom ${ATOM_CHANNEL}.app"
+      ATOM_ORIGINAL_APP_NAME="Atom ${ATOM_CHANNEL}.app"
+      export ATOM_APP_NAME="Atom-${ATOM_CHANNEL}.app"
+      ln -s "./atom/${ATOM_ORIGINAL_APP_NAME}" "./atom/${ATOM_APP_NAME}"
       export ATOM_SCRIPT_NAME="atom-${ATOM_CHANNEL}"
       export ATOM_SCRIPT_PATH="./atom-${ATOM_CHANNEL}"
       ln -s "./atom/${ATOM_APP_NAME}/Contents/Resources/app/atom.sh" "${ATOM_SCRIPT_PATH}"
