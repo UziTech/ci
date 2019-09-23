@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
-$script:PACKAGE_FOLDER = "$env:TRAVIS_BUILD_DIR"
+if ($env:APPVEYOR_BUILD_FOLDER) {
+  $script:PACKAGE_FOLDER = "$env:APPVEYOR_BUILD_FOLDER"
+} else {
+  $script:PACKAGE_FOLDER = "$env:TRAVIS_BUILD_DIR"
+}
 Set-Location $script:PACKAGE_FOLDER
 
 if ($env:ATOM_CHANNEL) {
@@ -36,7 +40,7 @@ function DownloadAtom() {
     Write-Host "Downloading latest Atom release..."
     $source = "https://atom.io/download/windows_zip?channel=$script:ATOM_CHANNEL"
     $destination = "$script:PACKAGE_FOLDER\atom.zip"
-    (New-Object Net.WebClient).DownloadFile($source, $destination)
+    Start-FileDownload $source -FileName $destination
     if ($LASTEXITCODE -ne 0) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
@@ -307,7 +311,8 @@ function ExitWithCode
     )
 
     $host.SetShouldExit($exitcode)
-    exit
+    Write-Host "Exit Code $exitcode"
+    exit $exitcode
 }
 
 function SetElectronEnvironmentVariables
