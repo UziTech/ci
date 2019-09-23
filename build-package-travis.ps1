@@ -40,7 +40,7 @@ function DownloadAtom() {
     Write-Host "Downloading latest Atom release..."
     $source = "https://atom.io/download/windows_zip?channel=$script:ATOM_CHANNEL"
     $destination = "$script:PACKAGE_FOLDER\atom.zip"
-    Start-FileDownload $source -FileNamex $destination
+    (New-Object Net.WebClient).DownloadFile($source, $destination)
     if (!$?) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
