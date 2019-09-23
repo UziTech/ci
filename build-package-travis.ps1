@@ -32,6 +32,7 @@ if ($env:ATOM_LINT_WITH_BUNDLED_NODE -eq "false") {
 }
 
 function DownloadAtom() {
+    $global:LASTEXITCODE = 0
     Write-Host "Downloading latest Atom release..."
     $source = "https://atom.io/download/windows_zip?channel=$script:ATOM_CHANNEL"
     $destination = "$script:PACKAGE_FOLDER\atom.zip"
@@ -55,6 +56,7 @@ function Unzip
 }
 
 function PrintVersions() {
+    $global:LASTEXITCODE = 0
     Write-Host -NoNewLine "Using Atom version: "
     $atomVer = & "$script:ATOM_EXE_PATH" --version | Out-String
     if ($LASTEXITCODE -ne 0) {
@@ -69,6 +71,7 @@ function PrintVersions() {
 }
 
 function InstallPackage() {
+    $global:LASTEXITCODE = 0
     Write-Host "Downloading package dependencies..."
     if ($script:ATOM_LINT_WITH_BUNDLED_NODE -eq $TRUE) {
       if (Test-Path -Path "package-lock.json" -PathType Leaf) {
@@ -131,6 +134,7 @@ function InstallPackage() {
 }
 
 function InstallDependencies() {
+    $global:LASTEXITCODE = 0
     if ($env:APM_TEST_PACKAGES) {
         Write-Host "Installing atom package dependencies..."
         $APM_TEST_PACKAGES = $env:APM_TEST_PACKAGES -split "\s+"
@@ -146,6 +150,7 @@ function InstallDependencies() {
 
 
 function HasLinter([String] $LinterName) {
+    $global:LASTEXITCODE = 0
     $output = &"$script:NPM_SCRIPT_PATH" ls --parseable --dev --depth=0 $LinterName 2>$null
     if ($LastExitCode -eq 0) {
         if ($output.Trim() -ne "") {
@@ -157,6 +162,7 @@ function HasLinter([String] $LinterName) {
 }
 
 function RunLinters() {
+    $global:LASTEXITCODE = 0
     $libpath = "$script:PACKAGE_FOLDER\lib"
     $libpathexists = Test-Path $libpath
     $srcpath = "$script:PACKAGE_FOLDER\src"
@@ -271,6 +277,7 @@ function RunLinters() {
 }
 
 function RunSpecs() {
+    $global:LASTEXITCODE = 0
     $specpath = "$script:PACKAGE_FOLDER\spec"
     $testpath = "$script:PACKAGE_FOLDER\test"
     $specpathexists = Test-Path $specpath
