@@ -41,7 +41,7 @@ function DownloadAtom() {
     $source = "https://atom.io/download/windows_zip?channel=$script:ATOM_CHANNEL"
     $destination = "$script:PACKAGE_FOLDER\atom.zip"
     Start-FileDownload $source -FileName $destination
-    if ($LASTEXITCODE -ne 0) {
+    if (!$?) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
 }
@@ -63,13 +63,13 @@ function PrintVersions() {
     $global:LASTEXITCODE = 0
     Write-Host -NoNewLine "Using Atom version: "
     $atomVer = & "$script:ATOM_EXE_PATH" --version | Out-String
-    if ($LASTEXITCODE -ne 0) {
+    if (!$?) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
     Write-Host $atomVer
     Write-Host "Using APM version: "
     & "$script:APM_SCRIPT_PATH" -v
-    if ($LASTEXITCODE -ne 0) {
+    if (!$?) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
 }
@@ -80,18 +80,18 @@ function InstallPackage() {
     if ($script:ATOM_LINT_WITH_BUNDLED_NODE -eq $TRUE) {
       if (Test-Path -Path "package-lock.json" -PathType Leaf) {
         & "$script:APM_SCRIPT_PATH" ci
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
         }
       } else {
         Write-Warning "package-lock.json not found; running apm install instead of apm ci"
         & "$script:APM_SCRIPT_PATH" install
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
         }
 
         & "$script:APM_SCRIPT_PATH" clean
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
         }
       }
@@ -102,36 +102,36 @@ function InstallPackage() {
     } else {
       if (Test-Path -Path "package-lock.json" -PathType Leaf) {
         & "$script:APM_SCRIPT_PATH" ci --production
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
             ExitWithCode -exitcode $LASTEXITCODE
         }
       } else {
         Write-Warning "package-lock.json not found; running apm install instead of apm ci"
         & "$script:APM_SCRIPT_PATH" install --production
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
             ExitWithCode -exitcode $LASTEXITCODE
         }
 
         & "$script:APM_SCRIPT_PATH" clean
-        if ($LASTEXITCODE -ne 0) {
+        if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
         }
       }
       # Use the system NPM to install the devDependencies
       Write-Host "Using Node.js version:"
       & node --version
-      if ($LASTEXITCODE -ne 0) {
+      if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
       }
       Write-Host "Using NPM version:"
       & npm --version
-      if ($LASTEXITCODE -ne 0) {
+      if (!$?) {
           ExitWithCode -exitcode $LASTEXITCODE
       }
       Write-Host "Installing remaining dependencies..."
       & npm install
     }
-    if ($LASTEXITCODE -ne 0) {
+    if (!$?) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
     InstallDependencies
@@ -145,7 +145,7 @@ function InstallDependencies() {
         $APM_TEST_PACKAGES | foreach {
             Write-Host "$_"
             & "$script:APM_SCRIPT_PATH" install $_
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
@@ -156,7 +156,7 @@ function InstallDependencies() {
 function HasLinter([String] $LinterName) {
     $global:LASTEXITCODE = 0
     $output = &"$script:NPM_SCRIPT_PATH" ls --parseable --dev --depth=0 $LinterName 2>$null
-    if ($LastExitCode -eq 0) {
+    if ($?) {
         if ($output.Trim() -ne "") {
             return $true
         }
@@ -188,21 +188,21 @@ function RunLinters() {
     if ($libpathexists) {
         if ($lintwithcoffeelint) {
             & "$coffeelintpath" lib
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwitheslint) {
             & "$eslintpath" lib
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwithstandard) {
             & "$standardpath" lib/**/*.js
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
@@ -211,21 +211,21 @@ function RunLinters() {
     if ($srcpathexists) {
         if ($lintwithcoffeelint) {
             & "$coffeelintpath" src
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwitheslint) {
             & "$eslintpath" src
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwithstandard) {
             & "$standardpath" src/**/*.js
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
@@ -235,21 +235,21 @@ function RunLinters() {
         Write-Host "Linting package specs..."
         if ($lintwithcoffeelint) {
             & "$coffeelintpath" spec
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwitheslint) {
             & "$eslintpath" spec
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwithstandard) {
             & "$standardpath" spec/**/*.js
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
@@ -259,21 +259,21 @@ function RunLinters() {
         Write-Host "Linting package tests..."
         if ($lintwithcoffeelint) {
             & "$coffeelintpath" test
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwitheslint) {
             & "$eslintpath" test
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
 
         if ($lintwithstandard) {
             & "$standardpath" test/**/*.js
-            if ($LASTEXITCODE -ne 0) {
+            if (!$?) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
         }
@@ -297,7 +297,7 @@ function RunSpecs() {
       & "$script:ATOM_EXE_PATH" --test test 2>&1 | %{ "$_" }
     }
 
-    if ($LASTEXITCODE -ne 0) {
+    if (!$?) {
         Write-Host "Specs Failed"
         ExitWithCode -exitcode $LASTEXITCODE
     }
@@ -309,6 +309,10 @@ function ExitWithCode
     (
         $exitcode
     )
+
+    if ($exitcode -eq 0) {
+      $exitcode = 1
+    }
 
     $host.SetShouldExit($exitcode)
     Write-Host "Exit Code $exitcode"
